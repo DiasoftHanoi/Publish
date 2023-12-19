@@ -1,0 +1,550 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram><Items>
+<Item><ItemNumber>1</ItemNumber>
+ <ItemGUID>9C977C3D-E332-4B1C-B554-2C6C4FC54278</ItemGUID>
+ 
+<ItemType>TStartItem</ItemType>
+<ItemName>StartItem1</ItemName>
+<ItemCaption>Начало процесса</ItemCaption>
+<ItemDescription>Исполнение процесса PageFlow начинается с этого элемента
+</ItemDescription>
+<ItemTop>10</ItemTop>
+<ItemLeft>10</ItemLeft>
+<ItemWidth>195</ItemWidth>
+<ItemHeight>60</ItemHeight>
+</Item>
+<Item><ItemNumber>2</ItemNumber>
+ <ItemGUID>246D5180-2CF4-4062-BF3D-3AFB2C661FD4</ItemGUID>
+ 
+<ItemType>TEndItem</ItemType>
+<ItemName>EndItem1</ItemName>
+<ItemCaption>Завершение процесса</ItemCaption>
+<ItemDescription>Исполнение процесса PageFlow будет завершено при достижении этого элемента
+</ItemDescription>
+<ItemTop>849</ItemTop>
+<ItemLeft>527</ItemLeft>
+<ItemWidth>195</ItemWidth>
+<ItemHeight>60</ItemHeight>
+</Item>
+<Item><ItemNumber>3</ItemNumber>
+ <ItemGUID>8F6D1033-2C08-4140-B4CC-C9F63C228E5C</ItemGUID>
+ 
+<ItemType>TRemoteAction</ItemType>
+<ItemName>RemoteAction1</ItemName>
+<ItemCaption>Запуск правила</ItemCaption>
+<ItemDescription></ItemDescription>
+<ItemTop>650</ItemTop>
+<ItemLeft>13</ItemLeft>
+<ItemWidth>195</ItemWidth>
+<ItemHeight>60</ItemHeight>
+<ItemData><![CDATA[[dmsws]?ruleResult]]></ItemData>
+<ItemCallMode>cmSyncCall</ItemCallMode>
+<ItemIncludeSessionVariables>False</ItemIncludeSessionVariables>
+<ItemUserAuthentication>True</ItemUserAuthentication>
+<ItemInputParam name="SYSNAME" type="STRING" mappedto="PROCESS" value="RULESYSNAME" describe=""></ItemInputParam>
+<ItemInputParam name="RULEPARAMS" type="OBJECT" mappedto="PROCESS" value="appObj" describe=""></ItemInputParam>
+<ItemInputParam name="ReturnAsHashMap" type="STRING" mappedto="CONSTANTS" value="TRUE" describe=""></ItemInputParam>
+<ItemOutputParam name="RULERESULT" type="OBJECT" mappedto="PROCESS" value="checkRuleResult" describe=""></ItemOutputParam>
+<ItemOutputParam name="RULEBUSINESSPROTOCOL" type="OBJECT" mappedto="PROCESS" value="RULEBUSINESSPROTOCOL" describe=""></ItemOutputParam>
+<ItemOutputParam name="RULEPROTOCOL" type="OBJECT" mappedto="PROCESS" value="RULEPROTOCOL" describe=""></ItemOutputParam>
+<ItemOutputParam name="lastErrorStack" type="OBJECT" mappedto="PROCESS" value="lastErrorStack" describe=""></ItemOutputParam>
+</Item>
+<Item><ItemNumber>4</ItemNumber>
+ <ItemGUID>200F9A02-6309-4DD1-891B-F6146079BE43</ItemGUID>
+ 
+<ItemType>TJavaScriptItem</ItemType>
+<ItemName>JavaScriptItem1</ItemName>
+<ItemCaption>Постобработка</ItemCaption>
+<ItemDescription></ItemDescription>
+<ItemTop>104</ItemTop>
+<ItemLeft>270</ItemLeft>
+<ItemWidth>195</ItemWidth>
+<ItemHeight>600</ItemHeight>
+<ItemData><![CDATA[var checkRuleResult = getInputParams("checkRuleResult")!=null ? getInputParams("checkRuleResult") : -1;
+var lastErrorStack = getInputParams("lastErrorStack");
+var ruleProtocol = getInputParams("RULEPROTOCOL");
+var ruleBusinessProtocol = getInputParams("RULEBUSINESSPROTOCOL");
+
+var checkResult = "Error";
+
+if(lastErrorStack != null){
+	var errorList = lastErrorStack.get("Result");
+	if(errorList != null){
+		var error = errorList.get(0);
+		ruleProtocol = error.get("PARAMS").get("MSGTXT");
+	}
+}else{
+        if(ruleBusinessProtocol!=null && ruleBusinessProtocol!=""){
+            var infoKeySet = new java.util.HashSet();
+            infoKeySet = ruleBusinessProtocol.keySet();
+            for(var i=0; i<infoKeySet.size(); i++) { 
+               key = infoKeySet.toArray()[i];
+               if(ruleBusinessProtocol.get(key)!=null && ruleBusinessProtocol.get(key)!=""){
+                  ruleProtocol = ruleBusinessProtocol.get(key);
+                  break; 
+               }
+            }
+        }
+	if(checkRuleResult != null && checkRuleResult != "" && checkRuleResult != -1){
+		checkResult = "Passed";
+		if(parseInt(checkRuleResult) == 0){
+			checkResult = "Not passed";
+		}
+		if(parseInt(checkRuleResult) == 2){
+			checkResult = "No data";
+		}    
+	}
+}
+var ruleResult = new java.util.HashMap();
+ruleResult.put("checkResult", checkRuleResult);
+
+OutputParams.get("CHECKRESULT").setParamData(checkResult);
+OutputParams.get("RULERESULT").setParamData(ruleResult);
+OutputParams.get("RULEPROTOCOL").setParamData(ruleProtocol);
+OutputParams.get("ENDCHECKDATE").setParamData(new java.util.Date());
+]]></ItemData>
+<ItemInputParam name="checkRuleResult" type="OBJECT" mappedto="PROCESS" value="checkRuleResult" describe=""></ItemInputParam>
+<ItemInputParam name="lastErrorStack" type="OBJECT" mappedto="PROCESS" value="lastErrorStack" describe=""></ItemInputParam>
+<ItemInputParam name="RULEBUSINESSPROTOCOL" type="OBJECT" mappedto="PROCESS" value="RULEBUSINESSPROTOCOL" describe=""></ItemInputParam>
+<ItemInputParam name="RULEPROTOCOL" type="OBJECT" mappedto="PROCESS" value="RULEPROTOCOL" describe=""></ItemInputParam>
+<ItemOutputParam name="CHECKRESULT" type="STRING" mappedto="PROCESS" value="CHECKRESULT" describe=""></ItemOutputParam>
+<ItemOutputParam name="RULERESULT" type="OBJECT" mappedto="PROCESS" value="RULERESULT" describe=""></ItemOutputParam>
+<ItemOutputParam name="RULEPROTOCOL" type="OBJECT" mappedto="PROCESS" value="RULEPROTOCOL" describe=""></ItemOutputParam>
+<ItemOutputParam name="ENDCHECKDATE" type="DATETIME" mappedto="PROCESS" value="ENDCHECKDATE" describe=""></ItemOutputParam>
+</Item>
+<Item><ItemNumber>5</ItemNumber>
+ <ItemGUID>2295FBE0-9C6D-4C24-8209-FD4CB8C896DD</ItemGUID>
+ 
+<ItemType>TRemoteAction</ItemType>
+<ItemName>RemoteAction2</ItemName>
+<ItemCaption>ruleGetByIdOrSysname</ItemCaption>
+<ItemDescription>Описание данного шага процесса
+</ItemDescription>
+<ItemTop>195</ItemTop>
+<ItemLeft>10</ItemLeft>
+<ItemWidth>195</ItemWidth>
+<ItemHeight>60</ItemHeight>
+<ItemData><![CDATA[[dmsws]?ruleGetByIdOrSysname]]></ItemData>
+<ItemCallMode>cmSyncCall</ItemCallMode>
+<ItemIncludeSessionVariables>False</ItemIncludeSessionVariables>
+<ItemUserAuthentication>True</ItemUserAuthentication>
+<ItemInputParam name="SYSNAME" type="STRING" mappedto="PROCESS" value="RULESYSNAME" describe=""></ItemInputParam>
+<ItemInputParam name="ReturnAsHashMap" type="STRING" mappedto="CONSTANTS" value="TRUE" describe=""></ItemInputParam>
+<ItemOutputParam name="DATASETID" type="STRING" mappedto="PROCESS" value="DATASETID" describe=""></ItemOutputParam>
+</Item>
+<Item><ItemNumber>6</ItemNumber>
+ <ItemGUID>F3BC5C71-230E-4274-BAAF-67752247A56E</ItemGUID>
+ 
+<ItemType>TRemoteAction</ItemType>
+<ItemName>RemoteAction3</ItemName>
+<ItemCaption>ruleDatasetParamGetListByParams</ItemCaption>
+<ItemDescription>Описание данного шага процесса
+</ItemDescription>
+<ItemTop>287</ItemTop>
+<ItemLeft>10</ItemLeft>
+<ItemWidth>195</ItemWidth>
+<ItemHeight>60</ItemHeight>
+<ItemData><![CDATA[[dmsws]?ruleDatasetParamGetListByParams]]></ItemData>
+<ItemCallMode>cmSyncCall</ItemCallMode>
+<ItemIncludeSessionVariables>False</ItemIncludeSessionVariables>
+<ItemUserAuthentication>True</ItemUserAuthentication>
+<ItemInputParam name="DATASETID" type="STRING" mappedto="PROCESS" value="DATASETID" describe=""></ItemInputParam>
+<ItemOutputParam name="Result" type="OBJECT" mappedto="PROCESS" value="paramsList" describe=""></ItemOutputParam>
+</Item>
+<Item><ItemNumber>7</ItemNumber>
+ <ItemGUID>0FD85A6F-4BD3-47C3-85CC-6CD148527567</ItemGUID>
+ 
+<ItemType>TJavaScriptItem</ItemType>
+<ItemName>JavaScriptItem2</ItemName>
+<ItemCaption>Параметры для правила</ItemCaption>
+<ItemDescription>Описание данного шага процесса
+</ItemDescription>
+<ItemTop>377</ItemTop>
+<ItemLeft>10</ItemLeft>
+<ItemWidth>195</ItemWidth>
+<ItemHeight>60</ItemHeight>
+<ItemData><![CDATA[var paramsList = InputParams.get("paramsList").getParamData();
+var needAttributesList = new java.util.ArrayList();
+
+if(paramsList!=null){
+  for(var i=0; i<paramsList.size(); i++){
+     needAttributesList.add(paramsList.get(i).get("SYSNAME"));
+  }  
+}
+
+ needAttributesList.add("decisionStageResults");
+logger.info(">>> Начитываем decisionStageResults ");
+OutputParams.get("needAttributesList").setParamData(needAttributesList);
+
+
+]]></ItemData>
+<ItemInputParam name="paramsList" type="OBJECT" mappedto="PROCESS" value="paramsList" describe=""></ItemInputParam>
+<ItemOutputParam name="needAttributesList" type="OBJECT" mappedto="PROCESS" value="needAttributesList" describe=""></ItemOutputParam>
+</Item>
+<Item><ItemNumber>8</ItemNumber>
+ <ItemGUID>495A905A-9970-44F5-8F17-DB8979FE0EFE</ItemGUID>
+ 
+<ItemType>TRemoteAction</ItemType>
+<ItemName>RemoteAction4</ItemName>
+<ItemCaption>Чтение заявки</ItemCaption>
+<ItemDescription>Описание данного шага процесса
+</ItemDescription>
+<ItemTop>472</ItemTop>
+<ItemLeft>8</ItemLeft>
+<ItemWidth>187</ItemWidth>
+<ItemHeight>60</ItemHeight>
+<ItemData><![CDATA[[ftfloanws]?loanApplicationGetByID]]></ItemData>
+<ItemCallMode>cmSyncCall</ItemCallMode>
+<ItemIncludeSessionVariables>False</ItemIncludeSessionVariables>
+<ItemUserAuthentication>True</ItemUserAuthentication>
+<ItemInputParam name="DOCUMENTID" type="LONG" mappedto="PROCESS" value="APPLICATIONID" describe=""></ItemInputParam>
+<ItemInputParam name="needAttributesList" type="OBJECT" mappedto="PROCESS" value="needAttributesList" describe=""></ItemInputParam>
+<ItemOutputParam name="Result" type="OBJECT" mappedto="PROCESS" value="appObjList" describe=""></ItemOutputParam>
+</Item>
+<Item><ItemNumber>9</ItemNumber>
+ <ItemGUID>C9C74963-C583-4E65-ABA5-4F41D7C204F5</ItemGUID>
+ 
+<ItemType>TCaseOpItem</ItemType>
+<ItemName>CaseOpItem1</ItemName>
+<ItemCaption>Проверка APPLICATIONID</ItemCaption>
+<ItemDescription>Описание данного шага процесса</ItemDescription>
+<ItemTop>106</ItemTop>
+<ItemLeft>10</ItemLeft>
+<ItemWidth>195</ItemWidth>
+<ItemHeight>60</ItemHeight>
+<ItemData><![CDATA[return getInputParams("APPLICATIONID") != null ? "NEXT" : "EXIT";
+]]></ItemData>
+<CaseType>JavaScript</CaseType>
+<ItemInputParam name="APPLICATIONID" type="LONG" mappedto="PROCESS" value="APPLICATIONID" describe=""></ItemInputParam>
+</Item>
+<Item><ItemNumber>10</ItemNumber>
+ <ItemGUID>AFDAB5AF-68AB-412C-889C-8CB2B411337F</ItemGUID>
+ 
+<ItemType>TJavaScriptItem</ItemType>
+<ItemName>JavaScriptItem3</ItemName>
+<ItemCaption>Подгоовка вызова правила</ItemCaption>
+<ItemDescription>Описание данного шага процесса</ItemDescription>
+<ItemTop>559</ItemTop>
+<ItemLeft>12</ItemLeft>
+<ItemWidth>195</ItemWidth>
+<ItemHeight>60</ItemHeight>
+<ItemData><![CDATA[var appObjList = nvl(getInputParams("appObjList"), new java.util.HashMap());
+var extraParams = nvl(getInputParams("extraParams"), new java.util.HashMap());
+var appObj = nvl(appObjList, new java.util.HashMap());
+
+var decisionResults = appObj.get("decisionStageResults");
+if (decisionResults != null) appObj.putAll(decisionResults);
+
+appObj.putAll(extraParams);
+
+setOutputParams("appObj", appObj.clone());
+////////////////////////////////////////////////////////////////////////////////
+function nvl(v,d){ return v!=null ? v : d}
+]]></ItemData>
+<ItemInputParam name="extraParams" type="OBJECT" mappedto="PROCESS" value="extraParams" describe=""></ItemInputParam>
+<ItemInputParam name="appObjList" type="OBJECT" mappedto="PROCESS" value="appObjList" describe=""></ItemInputParam>
+<ItemOutputParam name="appObj" type="OBJECT" mappedto="PROCESS" value="appObj" describe=""></ItemOutputParam>
+</Item>
+<Item><ItemNumber>11</ItemNumber>
+ <ItemGUID>FFA0E722-D288-4BAD-9304-42D2B3E7BA3A</ItemGUID>
+ 
+<ItemType>TRemoteAction</ItemType>
+<ItemName>RemoteAction5</ItemName>
+<ItemCaption>Изменение записи в протоколе</ItemCaption>
+<ItemDescription></ItemDescription>
+<ItemTop>851</ItemTop>
+<ItemLeft>272</ItemLeft>
+<ItemWidth>195</ItemWidth>
+<ItemHeight>60</ItemHeight>
+<ItemData><![CDATA[[dmsws]?checkProtocolModify]]></ItemData>
+<ItemCallMode>cmSyncCall</ItemCallMode>
+<ItemIncludeSessionVariables>False</ItemIncludeSessionVariables>
+<ItemUserAuthentication>True</ItemUserAuthentication>
+<ItemInputParam name="CHECKPROTOCOLID" type="STRING" mappedto="PROCESS" value="CHECKPROTOCOLID" describe=""></ItemInputParam>
+<ItemInputParam name="CHECKSTATUS" type="STRING" mappedto="CONSTANTS" value="Done" describe=""></ItemInputParam>
+<ItemInputParam name="CHECKRESULT" type="STRING" mappedto="PROCESS" value="CHECKRESULT" describe=""></ItemInputParam>
+<ItemInputParam name="CHECKDETAILS" type="STRING" mappedto="PROCESS" value="RULEPROTOCOL" describe=""></ItemInputParam>
+<ItemInputParam name="RULERESULT" type="OBJECT" mappedto="PROCESS" value="RULERESULT" describe=""></ItemInputParam>
+<ItemInputParam name="ENDCHECKDATE" type="DATETIME" mappedto="PROCESS" value="ENDCHECKDATE" describe=""></ItemInputParam>
+</Item>
+<Item><ItemNumber>12</ItemNumber>
+ <ItemGUID>27735B10-4014-49ED-BC2D-4E4A8BF37B82</ItemGUID>
+ 
+<ItemType>TCaseOpItem</ItemType>
+<ItemName>CaseOpItem2</ItemName>
+<ItemCaption>Есть во входящих CHECKPROTOCOLID?</ItemCaption>
+<ItemDescription>Описание данного шага процесса
+</ItemDescription>
+<ItemTop>748</ItemTop>
+<ItemLeft>273</ItemLeft>
+<ItemWidth>450</ItemWidth>
+<ItemHeight>60</ItemHeight>
+<ItemData><![CDATA[var CHECKPROTOCOLID = InputParams.get("CHECKPROTOCOLID").getParamData();
+OutputParams.get("ENDCHECKDATE").setParamData(new java.util.Date());
+
+if(CHECKPROTOCOLID != null && CHECKPROTOCOLID != ""){
+   return "PROTOCOL";
+}
+  
+return "NEXT";
+]]></ItemData>
+<CaseType>JavaScript</CaseType>
+<ItemInputParam name="CHECKPROTOCOLID" type="STRING" mappedto="PROCESS" value="CHECKPROTOCOLID" describe=""></ItemInputParam>
+<ItemOutputParam name="ENDCHECKDATE" type="DATETIME" mappedto="PROCESS" value="ENDCHECKDATE" describe=""></ItemOutputParam>
+</Item>
+</Items>
+<Links><Link>
+<LinkNumber>1</LinkNumber>
+<LinkType>TLink</LinkType>
+<ItemName>Link1</ItemName>
+<LinkCaption></LinkCaption>
+<Caption>.</Caption>
+<LinkStartItem>1</LinkStartItem>
+<LinkEndItem>9</LinkEndItem>
+<MiddlePointTop>88</MiddlePointTop>
+<MiddlePointLeft>107</MiddlePointLeft>
+<MiddlePoint2Top>0</MiddlePoint2Top>
+<MiddlePoint2Left>0</MiddlePoint2Left>
+</Link><Link>
+<LinkNumber>2</LinkNumber>
+<LinkType>TLink</LinkType>
+<ItemName>Link2</ItemName>
+<LinkCaption>NEXT</LinkCaption>
+<Caption>NEXT</Caption>
+<LinkStartItem>9</LinkStartItem>
+<LinkEndItem>5</LinkEndItem>
+<MiddlePointTop>180</MiddlePointTop>
+<MiddlePointLeft>107</MiddlePointLeft>
+<MiddlePoint2Top>0</MiddlePoint2Top>
+<MiddlePoint2Left>0</MiddlePoint2Left>
+</Link><Link>
+<LinkNumber>3</LinkNumber>
+<LinkType>TLink</LinkType>
+<ItemName>Link3</ItemName>
+<LinkCaption>EXIT</LinkCaption>
+<Caption>EXIT</Caption>
+<LinkStartItem>9</LinkStartItem>
+<LinkEndItem>4</LinkEndItem>
+<MiddlePointTop>136</MiddlePointTop>
+<MiddlePointLeft>237</MiddlePointLeft>
+<MiddlePoint2Top>0</MiddlePoint2Top>
+<MiddlePoint2Left>0</MiddlePoint2Left>
+</Link><Link>
+<LinkNumber>4</LinkNumber>
+<LinkType>TExceptionLink</LinkType>
+<ItemName>ExceptionLink1</ItemName>
+<LinkCaption></LinkCaption>
+<Caption>.</Caption>
+<LinkStartItem>5</LinkStartItem>
+<LinkEndItem>4</LinkEndItem>
+<MiddlePointTop>225</MiddlePointTop>
+<MiddlePointLeft>237</MiddlePointLeft>
+<MiddlePoint2Top>0</MiddlePoint2Top>
+<MiddlePoint2Left>0</MiddlePoint2Left>
+</Link><Link>
+<LinkNumber>5</LinkNumber>
+<LinkType>TExceptionLink</LinkType>
+<ItemName>ExceptionLink2</ItemName>
+<LinkCaption></LinkCaption>
+<Caption>.</Caption>
+<LinkStartItem>6</LinkStartItem>
+<LinkEndItem>4</LinkEndItem>
+<MiddlePointTop>318</MiddlePointTop>
+<MiddlePointLeft>233</MiddlePointLeft>
+<MiddlePoint2Top>0</MiddlePoint2Top>
+<MiddlePoint2Left>0</MiddlePoint2Left>
+</Link><Link>
+<LinkNumber>6</LinkNumber>
+<LinkType>TExceptionLink</LinkType>
+<ItemName>ExceptionLink3</ItemName>
+<LinkCaption></LinkCaption>
+<Caption>.</Caption>
+<LinkStartItem>8</LinkStartItem>
+<LinkEndItem>4</LinkEndItem>
+<MiddlePointTop>502</MiddlePointTop>
+<MiddlePointLeft>237</MiddlePointLeft>
+<MiddlePoint2Top>0</MiddlePoint2Top>
+<MiddlePoint2Left>0</MiddlePoint2Left>
+</Link><Link>
+<LinkNumber>7</LinkNumber>
+<LinkType>TExceptionLink</LinkType>
+<ItemName>ExceptionLink4</ItemName>
+<LinkCaption></LinkCaption>
+<Caption>.</Caption>
+<LinkStartItem>3</LinkStartItem>
+<LinkEndItem>4</LinkEndItem>
+<MiddlePointTop>664</MiddlePointTop>
+<MiddlePointLeft>238</MiddlePointLeft>
+<MiddlePoint2Top>0</MiddlePoint2Top>
+<MiddlePoint2Left>0</MiddlePoint2Left>
+</Link><Link>
+<LinkNumber>8</LinkNumber>
+<LinkType>TLink</LinkType>
+<ItemName>Link4</ItemName>
+<LinkCaption></LinkCaption>
+<Caption>.</Caption>
+<LinkStartItem>5</LinkStartItem>
+<LinkEndItem>6</LinkEndItem>
+<MiddlePointTop>271</MiddlePointTop>
+<MiddlePointLeft>107</MiddlePointLeft>
+<MiddlePoint2Top>0</MiddlePoint2Top>
+<MiddlePoint2Left>0</MiddlePoint2Left>
+</Link><Link>
+<LinkNumber>9</LinkNumber>
+<LinkType>TLink</LinkType>
+<ItemName>Link5</ItemName>
+<LinkCaption></LinkCaption>
+<Caption>.</Caption>
+<LinkStartItem>6</LinkStartItem>
+<LinkEndItem>7</LinkEndItem>
+<MiddlePointTop>362</MiddlePointTop>
+<MiddlePointLeft>107</MiddlePointLeft>
+<MiddlePoint2Top>0</MiddlePoint2Top>
+<MiddlePoint2Left>0</MiddlePoint2Left>
+</Link><Link>
+<LinkNumber>10</LinkNumber>
+<LinkType>TLink</LinkType>
+<ItemName>Link6</ItemName>
+<LinkCaption></LinkCaption>
+<Caption>.</Caption>
+<LinkStartItem>7</LinkStartItem>
+<LinkEndItem>8</LinkEndItem>
+<MiddlePointTop>454</MiddlePointTop>
+<MiddlePointLeft>107</MiddlePointLeft>
+<MiddlePoint2Top>0</MiddlePoint2Top>
+<MiddlePoint2Left>0</MiddlePoint2Left>
+</Link><Link>
+<LinkNumber>11</LinkNumber>
+<LinkType>TLink</LinkType>
+<ItemName>Link7</ItemName>
+<LinkCaption></LinkCaption>
+<Caption>.</Caption>
+<LinkStartItem>8</LinkStartItem>
+<LinkEndItem>10</LinkEndItem>
+<MiddlePointTop>545</MiddlePointTop>
+<MiddlePointLeft>108</MiddlePointLeft>
+<MiddlePoint2Top>0</MiddlePoint2Top>
+<MiddlePoint2Left>0</MiddlePoint2Left>
+</Link><Link>
+<LinkNumber>12</LinkNumber>
+<LinkType>TExceptionLink</LinkType>
+<ItemName>ExceptionLink6</ItemName>
+<LinkCaption></LinkCaption>
+<Caption>.</Caption>
+<LinkStartItem>10</LinkStartItem>
+<LinkEndItem>4</LinkEndItem>
+<MiddlePointTop>588</MiddlePointTop>
+<MiddlePointLeft>238</MiddlePointLeft>
+<MiddlePoint2Top>0</MiddlePoint2Top>
+<MiddlePoint2Left>0</MiddlePoint2Left>
+</Link><Link>
+<LinkNumber>13</LinkNumber>
+<LinkType>TLink</LinkType>
+<ItemName>Link9</ItemName>
+<LinkCaption></LinkCaption>
+<Caption>.</Caption>
+<LinkStartItem>10</LinkStartItem>
+<LinkEndItem>3</LinkEndItem>
+<MiddlePointTop>633</MiddlePointTop>
+<MiddlePointLeft>110</MiddlePointLeft>
+<MiddlePoint2Top>0</MiddlePoint2Top>
+<MiddlePoint2Left>0</MiddlePoint2Left>
+</Link><Link>
+<LinkNumber>14</LinkNumber>
+<LinkType>TExceptionLink</LinkType>
+<ItemName>ExceptionLink7</ItemName>
+<LinkCaption></LinkCaption>
+<Caption>.</Caption>
+<LinkStartItem>7</LinkStartItem>
+<LinkEndItem>4</LinkEndItem>
+<MiddlePointTop>407</MiddlePointTop>
+<MiddlePointLeft>237</MiddlePointLeft>
+<MiddlePoint2Top>0</MiddlePoint2Top>
+<MiddlePoint2Left>0</MiddlePoint2Left>
+</Link><Link>
+<LinkNumber>15</LinkNumber>
+<LinkType>TLink</LinkType>
+<ItemName>Link8</ItemName>
+<LinkCaption>PROTOCOL</LinkCaption>
+<Caption>PROTOCOL</Caption>
+<LinkStartItem>12</LinkStartItem>
+<LinkEndItem>11</LinkEndItem>
+<MiddlePointTop>829</MiddlePointTop>
+<MiddlePointLeft>372</MiddlePointLeft>
+<MiddlePoint2Top>0</MiddlePoint2Top>
+<MiddlePoint2Left>0</MiddlePoint2Left>
+</Link><Link>
+<LinkNumber>16</LinkNumber>
+<LinkType>TLink</LinkType>
+<ItemName>Link10</ItemName>
+<LinkCaption></LinkCaption>
+<Caption>.</Caption>
+<LinkStartItem>4</LinkStartItem>
+<LinkEndItem>12</LinkEndItem>
+<MiddlePointTop>726</MiddlePointTop>
+<MiddlePointLeft>333</MiddlePointLeft>
+<MiddlePoint2Top>0</MiddlePoint2Top>
+<MiddlePoint2Left>0</MiddlePoint2Left>
+</Link><Link>
+<LinkNumber>17</LinkNumber>
+<LinkType>TLink</LinkType>
+<ItemName>Link11</ItemName>
+<LinkCaption>NEXT</LinkCaption>
+<Caption>NEXT</Caption>
+<LinkStartItem>12</LinkStartItem>
+<LinkEndItem>2</LinkEndItem>
+<MiddlePointTop>828</MiddlePointTop>
+<MiddlePointLeft>624</MiddlePointLeft>
+<MiddlePoint2Top>0</MiddlePoint2Top>
+<MiddlePoint2Left>0</MiddlePoint2Left>
+</Link><Link>
+<LinkNumber>18</LinkNumber>
+<LinkType>TLink</LinkType>
+<ItemName>Link12</ItemName>
+<LinkCaption></LinkCaption>
+<Caption>.</Caption>
+<LinkStartItem>11</LinkStartItem>
+<LinkEndItem>2</LinkEndItem>
+<MiddlePointTop>868</MiddlePointTop>
+<MiddlePointLeft>496</MiddlePointLeft>
+<MiddlePoint2Top>0</MiddlePoint2Top>
+<MiddlePoint2Left>0</MiddlePoint2Left>
+</Link><Link>
+<LinkNumber>19</LinkNumber>
+<LinkType>TExceptionLink</LinkType>
+<ItemName>ExceptionLink5</ItemName>
+<LinkCaption></LinkCaption>
+<Caption>.</Caption>
+<LinkStartItem>11</LinkStartItem>
+<LinkEndItem>2</LinkEndItem>
+<MiddlePointTop>892</MiddlePointTop>
+<MiddlePointLeft>497</MiddlePointLeft>
+<MiddlePoint2Top>0</MiddlePoint2Top>
+<MiddlePoint2Left>0</MiddlePoint2Left>
+</Link><Link>
+<LinkNumber>20</LinkNumber>
+<LinkType>TExceptionLink</LinkType>
+<ItemName>ExceptionLink8</ItemName>
+<LinkCaption></LinkCaption>
+<Caption>.</Caption>
+<LinkStartItem>4</LinkStartItem>
+<LinkEndItem>12</LinkEndItem>
+<MiddlePointTop>728</MiddlePointTop>
+<MiddlePointLeft>397</MiddlePointLeft>
+<MiddlePoint2Top>0</MiddlePoint2Top>
+<MiddlePoint2Left>0</MiddlePoint2Left>
+</Link><Link>
+<LinkNumber>21</LinkNumber>
+<LinkType>TLink</LinkType>
+<ItemName>Link13</ItemName>
+<LinkCaption></LinkCaption>
+<Caption>Link21</Caption>
+<LinkStartItem>3</LinkStartItem>
+<LinkEndItem>4</LinkEndItem>
+<MiddlePointTop>689</MiddlePointTop>
+<MiddlePointLeft>240</MiddlePointLeft>
+<MiddlePoint2Top>0</MiddlePoint2Top>
+<MiddlePoint2Left>0</MiddlePoint2Left>
+</Link>
+</Links>
+</Diagram>
