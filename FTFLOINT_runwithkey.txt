@@ -1,0 +1,1 @@
+install.bat -Dfilename=install_base.xml --url=jdbc:jtds:sqlserver://IP_DB:1433/FTPLATFORM --username=USER --password=PASS@123 --frontws2=http://IP_APP:9082/frontws2/frontws2 --corews=http://IP_APP:9080/corews/corews --srvLogin=tbp --srvPassword=123 --srvLocale=vi 1>datainstall_key.log 2>&1
