@@ -1,1 +1,0 @@
-install.bat -Dfilename=install_LOS.xml --url=jdbc:jtds:sqlserver://IP_DB:1433/FTPLATFORM --username=USER --password=PASS@123 --dmsws=http://IP_APP:9083/dmsws/dmsws --frontws2=http://IP_APP:9082/frontws2/frontws2 --corews=http://IP_APP:9080/corews/corews --srvLogin=tbp --srvPassword=123 --srvLocale=vi 1>FTDS.log 2>&1
